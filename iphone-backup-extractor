@@ -39,6 +39,16 @@ function is_mov() {
 	fi
 }
 
+function is_png() {
+	type="$@"
+	count=$(echo $type | grep -i "PNG image data" | wc -l)
+	if [[ "$count" -eq 1 ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
 function cp_if_different() {
 	ext="$1"
 	shift
@@ -61,13 +71,14 @@ for dir in */; do
 			#[[ "$current" -gt "$max" ]] && exit
 			type=$(file "$file" | cut -d ":" -f2)
 			if [[ "$(is_mov $type)" -eq 1 ]]; then
-				echo "   $file is a movie"
-				#cp -i $file "$target"/"$file".MOV
+				echo "   $file is a quicktime movie"
 				cp_if_different MOV "$file"
 			elif [[ "$(is_jpg $type)" -eq 1 ]]; then
-				echo "   $file is a jpeg"
-				#cp -i $file "$target"/"$file".JPG
+				echo "   $file is a jpeg image"
 				cp_if_different JPG "$file"
+			elif [[ "$(is_png $type)" -eq 1 ]]; then
+				echo "   $file is a png image"
+				cp_if_different PNG "$file"
 			else
 				echo "   $file has unknown type ($type)"
 			fi
