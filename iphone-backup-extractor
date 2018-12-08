@@ -9,6 +9,12 @@
 # Please change the location where the files should be saved
 target="/tmp/iphone-restore"
 
+if [[ "$1" == "-f" ]]; then
+	force=1
+	shift
+else
+	force=0
+fi
 
 set -e
 
@@ -84,8 +90,8 @@ for dir in */; do
 	for subdir in */; do
 		echo " working with subdirectory $subdir"
 		cd "$subdir"
-		if [[ -f ".iphone-backup-extractor" ]]; then
-			echo "subdirectory $subdir has already been searched completely."
+		if [[ -f ".iphone-backup-extractor" && "$force" -eq 0 ]]; then
+			echo "subdirectory $subdir has already been saved completely."
 			continue
 		fi
 		for file in *; do
@@ -113,7 +119,9 @@ for dir in */; do
 			fi
 			echo
 		done
-		date > .iphone-backup-extractor
+		if [[ "$force" -eq 0 ]]; then
+			date > .iphone-backup-extractor
+		fi
 		cd ..
 	done
 	
