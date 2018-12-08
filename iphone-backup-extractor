@@ -49,6 +49,16 @@ function is_png() {
 	fi
 }
 
+function is_mp4() {
+	type="$@"
+	count=$(echo $type | grep -i "MP4" | wc -l)
+	if [[ "$count" -eq 1 ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
 function is_heif() {
 	type="$@"
 	count=$(echo $type | grep -i "HEIF image" | wc -l)
@@ -92,6 +102,9 @@ for dir in */; do
 			elif [[ "$(is_heif $type)" -eq 1 ]]; then
 				echo "   $file is a heif image"
 				cp_if_different HEIF "$file"
+			elif [[ "$(is_mp4 $type)" -eq 1 ]]; then
+				echo "   $file is a mp4 movie"
+				cp_if_different MP4 "$file"				
 			else
 				echo "   $file has unknown type ($type)"
 			fi
