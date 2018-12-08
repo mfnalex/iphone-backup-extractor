@@ -106,7 +106,7 @@ for dir in */; do
 				echo "   $file is a mp4 movie"
 				cp_if_different MP4 "$file"				
 			else
-				echo "   $file has unknown type ($type)"
+				echo "   $file has unknown type ($type )"
 			fi
 			echo
 		done
