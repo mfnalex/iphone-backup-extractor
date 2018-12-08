@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# Copyright 2018 Alexander Majka / JEFF Media GbR
+# www.jeff-media.de
+# Version 1.0
+
+# THIS SCRIPT HAS TO BE PLACED IN THE ROOT OF THE IPHONE/IPAD BACKUP DIRECTORY
+# It will search through all the files and copy all images and videos
+# Please change the location where the files should be saved
+target="/tmp/iphone-restore"
+
+
+set -e
+
+shopt -s nullglob
+
+#max=100
+current=0
+
+mkdir -p "$target"
+
+function is_jpg() {
+	type="$@"
+	count=$(echo $type | grep -i "JPEG image data" | wc -l)
+	if [[ "$count" -eq 1 ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
+function is_mov() {
+	type="$@"
+	count=$(echo $type | grep -i "Apple QuickTime movie" | wc -l)
+	if [[ "$count" -eq 1 ]]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
+function cp_if_different() {
+	ext="$1"
+	shift
+	file="$@"
+	cmp --silent $file "$target"/"$file"."$ext" && echo "   $file has already been saved" || cp -i $file "$target"/"$file"."$ext"
+}
+
+for dir in */; do
+
+	cd "$dir"
+	echo "working with directory $dir"
+	
+	for subdir in */; do
+		echo " working with subdirectory $subdir"
+		cd "$subdir"
+		
+		for file in *; do
+			current=$((current+1))
+			echo "  processing file number $current ($file)"
+			#[[ "$current" -gt "$max" ]] && exit
+			type=$(file "$file" | cut -d ":" -f2)
+			if [[ "$(is_mov $type)" -eq 1 ]]; then
+				echo "   $file is a movie"
+				#cp -i $file "$target"/"$file".MOV
+				cp_if_different MOV "$file"
+			elif [[ "$(is_jpg $type)" -eq 1 ]]; then
+				echo "   $file is a jpeg"
+				#cp -i $file "$target"/"$file".JPG
+				cp_if_different JPG "$file"
+			else
+				echo "   $file has unknown type ($type)"
+			fi
+			echo
+		done
+		cd ..
+	done
+	
+	cd ..
+done
