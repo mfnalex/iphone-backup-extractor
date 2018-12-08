@@ -84,7 +84,10 @@ for dir in */; do
 	for subdir in */; do
 		echo " working with subdirectory $subdir"
 		cd "$subdir"
-		
+		if [[ -f ".iphone-backup-extractor" ]]; then
+			echo "subdirectory $subdir has already been searched completely."
+			continue
+		fi
 		for file in *; do
 			current=$((current+1))
 			echo "  processing file number $current ($file)"
@@ -110,6 +113,7 @@ for dir in */; do
 			fi
 			echo
 		done
+		date > .iphone-backup-extractor
 		cd ..
 	done
 	
