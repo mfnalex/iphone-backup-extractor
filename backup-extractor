@@ -92,6 +92,7 @@ for dir in */; do
 		cd "$subdir"
 		if [[ -f ".iphone-backup-extractor" && "$force" -eq 0 ]]; then
 			echo "subdirectory $subdir has already been saved completely."
+			cd ..
 			continue
 		fi
 		for file in *; do
